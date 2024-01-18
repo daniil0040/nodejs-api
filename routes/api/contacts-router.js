@@ -1,23 +1,35 @@
 import express from "express";
 
-import moviesController from "../../controllers/contacts-controllers.js";
+import contactsController from "../../controllers/contacts-controllers.js";
 
-import { isEmptyBody } from "../../middlewares/index.js";
+import { isEmptyBody, isValidId } from "../../middlewares/index.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", moviesController.getAll);
+contactsRouter.get("/", contactsController.getAll);
 
-contactsRouter.get("/:contactId", moviesController.getById);
+contactsRouter.get("/:contactId", isValidId, contactsController.getById);
 
-contactsRouter.post("/", isEmptyBody, moviesController.addContact);
+contactsRouter.post("/", isEmptyBody, contactsController.addContact);
 
-contactsRouter.delete("/:contactId", moviesController.deleteContact);
+contactsRouter.patch(
+  "/:contactId/favorite",
+  isValidId,
+  isEmptyBody,
+  contactsController.updateContactById
+);
+
+contactsRouter.delete(
+  "/:contactId",
+  isValidId,
+  contactsController.deleteContact
+);
 
 contactsRouter.put(
   "/:contactId",
+  isValidId,
   isEmptyBody,
-  moviesController.updateContactById
+  contactsController.updateContactById
 );
 
 export default contactsRouter;

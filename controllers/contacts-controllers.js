@@ -1,12 +1,16 @@
-import contactsService from "../models/contacts/index.js";
+import Contact from "../models/Contact.js";
 
 import { HttpError } from "../helpers/index.js";
 
-import { contactAddShema, contactUpdShema } from "../shemas/movie-shemas.js";
+import {
+  contactAddShema,
+  contactUpdShema,
+  movieFavoriteUpdSchema,
+} from "../models/Contact.js";
 
 const getAll = async (req, res, next) => {
   try {
-    const result = await contactsService.listContacts();
+    const result = await Contact.find();
     res.json(result);
   } catch (error) {
     next(error);
@@ -16,7 +20,7 @@ const getAll = async (req, res, next) => {
 const getById = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const result = await contactsService.getContactById(contactId);
+    const result = await Contact.findById(contactId);
     if (!result) {
       throw HttpError(404, `Contact with id=${contactId} not found`);
     }
@@ -33,7 +37,7 @@ const addContact = async (req, res, next) => {
     if (error) {
       throw HttpError(400, error.message);
     }
-    const result = await contactsService.addContact(body);
+    const result = await Contact.create(body);
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -43,7 +47,7 @@ const addContact = async (req, res, next) => {
 const deleteContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const result = await contactsService.removeContact(contactId);
+    const result = await Contact.findByIdAndDelete(contactId);
     if (!result) {
       throw HttpError(404, `Contact with id=${contactId} not found`);
     }
@@ -54,16 +58,23 @@ const deleteContact = async (req, res, next) => {
 };
 
 const updateContactById = async (req, res, next) => {
+  console.log(req.route.path);
   try {
     const body = req.body;
+    if (req.route.path === "/:contactId/favorite") {
+      const { error } = movieFavoriteUpdSchema.validate(body);
+      if (error) {
+        throw HttpError(400, error.message);
+      }
+    }
     const { error } = contactUpdShema.validate(body);
     if (error) {
       throw HttpError(400, error.message);
     }
     const { contactId } = req.params;
-    const result = await contactsService.updateContact(contactId, body);
+    const result = await Contact.findByIdAndUpdate(contactId, body);
     if (!result) {
-      throw HttpError(404, `Movie with id=${id} not found`);
+      throw HttpError(404, `Contact with id=${id} not found`);
     }
     res.json(result);
   } catch (error) {
