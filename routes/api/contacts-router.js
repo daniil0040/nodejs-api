@@ -16,7 +16,7 @@ contactsRouter.patch(
   "/:contactId/favorite",
   isValidId,
   isEmptyBody,
-  contactsController.updateContactById
+  contactsController.updateFavoriteById
 );
 
 contactsRouter.delete(

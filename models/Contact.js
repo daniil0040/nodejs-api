@@ -27,14 +27,12 @@ export const contactAddShema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().required(),
   phone: Joi.number().required(),
-  favorite: Joi.boolean(),
 });
 
 export const contactUpdShema = Joi.object({
   name: Joi.string(),
   email: Joi.string(),
   phone: Joi.number(),
-  favorite: Joi.boolean(),
 });
 
 export const movieFavoriteUpdSchema = Joi.object({

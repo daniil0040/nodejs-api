@@ -61,13 +61,25 @@ const updateContactById = async (req, res, next) => {
   console.log(req.route.path);
   try {
     const body = req.body;
-    if (req.route.path === "/:contactId/favorite") {
-      const { error } = movieFavoriteUpdSchema.validate(body);
-      if (error) {
-        throw HttpError(400, error.message);
-      }
-    }
     const { error } = contactUpdShema.validate(body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+    const { contactId } = req.params;
+    const result = await Contact.findByIdAndUpdate(contactId, body);
+    if (!result) {
+      throw HttpError(404, `Contact with id=${id} not found`);
+    }
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateFavoriteById = async (req, res, next) => {
+  try {
+    const body = req.body;
+    const { error } = movieFavoriteUpdSchema.validate(body);
     if (error) {
       throw HttpError(400, error.message);
     }
@@ -88,4 +100,5 @@ export default {
   addContact,
   deleteContact,
   updateContactById,
+  updateFavoriteById,
 };
