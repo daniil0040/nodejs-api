@@ -19,6 +19,10 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false }
 );
@@ -42,6 +46,7 @@ export const movieFavoriteUpdSchema = Joi.object({
 contactSchema.post("save", handleSaveErr);
 
 contactSchema.pre("findOneAndUpdate", addUpdSettings);
+
 contactSchema.post("findOneAndUpdate", handleSaveErr);
 
 const Contact = model("contact", contactSchema);
