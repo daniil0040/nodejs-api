@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
+import fs from "fs/promises";
+import path from "path";
+import gravatar from "gravatar";
 
 import User from "../models/User.js";
 
@@ -8,6 +11,7 @@ import { HttpError } from "../helpers/index.js";
 
 import { userSignUp, userLogIn } from "../models/User.js";
 
+const avatarsPath = path.resolve("public", "avatars");
 const { JWT_SECRET_KEY } = process.env;
 
 const signUp = async (req, res, next) => {
@@ -23,9 +27,20 @@ const signUp = async (req, res, next) => {
       throw HttpError(409, "Email already in use");
     }
 
+    // const { path: oldPath, filename } = req.file;
+    // const newPath = path.join(avatarsPath, filename);
+    // await fs.rename(oldPath, newPath);
+    // const avatar = path.join("avatars", filename);
+
+    const avatarURL = gravatar.url(email);
+
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const newUser = await User.create({
+      ...req.body,
+      password: hashPassword,
+      avatarURL,
+    });
 
     res.json({
       email: newUser.email,
