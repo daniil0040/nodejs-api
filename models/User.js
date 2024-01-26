@@ -39,6 +39,10 @@ export const userLogIn = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+export const userAvatar = Joi.object({
+  avatar: Joi.string().required(),
+});
+
 userSchema.post("save", handleSaveErr);
 
 userSchema.pre("findOneAndUpdate", addUpdSettings);

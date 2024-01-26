@@ -4,12 +4,13 @@ import "dotenv/config.js";
 import fs from "fs/promises";
 import path from "path";
 import gravatar from "gravatar";
+import Jimp from "jimp";
 
 import User from "../models/User.js";
 
 import { HttpError } from "../helpers/index.js";
 
-import { userSignUp, userLogIn } from "../models/User.js";
+import { userSignUp, userLogIn, userAvatar } from "../models/User.js";
 
 const avatarsPath = path.resolve("public", "avatars");
 const { JWT_SECRET_KEY } = process.env;
@@ -107,9 +108,29 @@ const getCurrent = (req, res, next) => {
   }
 };
 
+const updateAvatar = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const { path: oldPath, filename } = req.file;
+    const newPath = path.join(avatarsPath, filename);
+    await fs.rename(oldPath, newPath);
+    const avatar = path.join("avatars", filename);
+    Jimp.read(newPath, (error, image) => {
+      if (error) throw HttpError(404, "Avatar not found");
+      image.resize(250, 250).write(newPath);
+    });
+    await User.findByIdAndUpdate(_id, { avatarURL: avatar });
+    res.json({
+      avatarURL: avatar,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export default {
   signUp,
   logIn,
   getCurrent,
   logOut,
+  updateAvatar,
 };
